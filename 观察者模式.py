@@ -10,6 +10,9 @@ __author__ = 'LIUYuanYuan'
 
 # 设计原则：为了交互对象之间的松耦合设计而努力
 
+# 设计逻辑：1.所有的观察着有一个公共的接口，这样可观察者可以通过接口通知观察着
+#         2.所有的观察着必须在可观察者中注册（观察者初始化时候注册），这样主题才能通知到每一个观察着
+
 
 class Subject(object):
     def register_observer(self,o):
@@ -44,5 +47,37 @@ class WeatherData(Subject):
         var = self.observers.index(o)
         if(var >= 0):
             self.observers.pop(var)
+
     def notify_observer(self):
-        for i in self.observers
+        for i in self.observers:
+            i.update(self.temp, self.humidity, self.pressure)
+
+    def measurementsChanged(self):
+        self.notify_observer()
+
+    def setMeasurements(self, temp, humidity, pressure ):
+        self.temp = temp
+        self.humidity = humidity
+        self.pressure = pressure
+        self.measurementsChanged()
+
+class CurrentConditionsDisplay(Observer, DisplayElement):
+    def __init__(self, weatherdata):
+        self.weatherData = weatherdata
+        weatherdata.register_observer(self)
+
+    def update(self, temp, humidity, pressure):
+        self.temp = temp
+        self.humidity = humidity
+        self.pressure = pressure
+        self.display()
+
+    def display(self):
+        print("current conditions:{} F degrees and {} humidity".format(self.temp, self.humidity))
+
+
+if __name__ == '__main__':
+    weatherdata = WeatherData()
+    currentcondition = CurrentConditionsDisplay(weatherdata)
+
+    weatherdata.setMeasurements(80, 65, 27.5)
