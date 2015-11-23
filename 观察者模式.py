@@ -14,28 +14,28 @@ __author__ = 'LIUYuanYuan'
 #         2.所有的观察着必须在可观察者中注册（观察者初始化时候注册），这样主题才能通知到每一个观察着
 
 
-class Subject(object):
-    def register_observer(self,o):
-        pass
+# class Subject(object):
+#     def register_observer(self,o):
+#         pass
+#
+#     def remove_observer(self,o):
+#         pass
+#
+#     def notify_observer(self):
+#         pass
+#
+#
+# class Observer(object):
+#     def update(self, temp, humidity, pressure):
+#         pass
+#
+#
+# class DisplayElement(object):
+#     def display(self):
+#         pass
 
-    def remove_observer(self,o):
-        pass
 
-    def notify_observer(self):
-        pass
-
-
-class Observer(object):
-    def update(self, temp, humidity, pressure):
-        pass
-
-
-class DisplayElement(object):
-    def display(self):
-        pass
-
-
-class WeatherData(Subject):
+class WeatherData(object):
 
     def __init__(self):
         self.observers = []
@@ -61,7 +61,7 @@ class WeatherData(Subject):
         self.pressure = pressure
         self.measurementsChanged()
 
-class CurrentConditionsDisplay(Observer, DisplayElement):
+class CurrentConditionsDisplay(object):
     def __init__(self, weatherdata):
         self.weatherData = weatherdata
         weatherdata.register_observer(self)
