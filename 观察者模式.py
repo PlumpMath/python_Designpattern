@@ -45,4 +45,5 @@ class WeatherData(Subject):
         if(var >= 0):
             self.observers.pop(var)
     def notify_observer(self):
-        for i in self.observers
+        for i in self.observers:
+            i.update(temp, humidity, pressure)

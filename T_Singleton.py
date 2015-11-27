@@ -89,14 +89,16 @@ __author__ = '沅源'
 #         return ob
 
 
-#使用元类的方法
-#关于元类的知识 http://blog.jobbole.com/21351/
-#深入理解元类 http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014319106919344c4ef8b1e04c48778bb45796e0335839000
+# 使用元类的方法
+# 关于元类的知识 http://blog.jobbole.com/21351/
+# 深入理解元类 http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000 /0014319106919344c4ef8b1e04c48778bb45796e0335839000
 class Singleton2(type):
+
     def __init__(cls, name, bases, dict):
         print('init')
         super(Singleton2, cls).__init__(name, bases,dict)
         cls._instance = None
+
     def __call__(cls, *args, **kwargs):
         print('call')
         if cls._instance is None:
@@ -108,23 +110,28 @@ class Myclass3(object, metaclass= Singleton2):
 
 
 
-#使用装饰器
+# 使用装饰器
+
 
 def singleton(cls, *args, **kwargs):
+
     instances = {}
+
     def _singleton():
         if cls not in instances:
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
     return _singleton
 
+
 @singleton
-class Myclass4(object):
+class my_class4(object):
     a = 1
+
     def __init__(self, x=0):
         self.x = x
 
-one = Myclass4()
-two = Myclass4()
+one = my_class4()
+two = my_class4()
 
 
