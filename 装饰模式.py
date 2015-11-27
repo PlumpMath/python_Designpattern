@@ -6,19 +6,26 @@ __author__ = 'LIUYuanYuan'
 # 模式特点：增加一个修饰类包裹原来的类，装饰过的对象可替代原始对象
 # 原则：类应该对扩展开放，对修改关闭
 
-class Beverage(object):
-    description = 'Unknown Beverage'
 
+class Beverage(object):
+#     description = 'Unknown Beverage'
+#
     def get_description(self):
         return self.description
 
     def cost(self):
         pass
+#
+# class CondimentDecorator(object):
+#     def get_description(self):
+#         pass
+
 
 
 class CondimentDecorator(Beverage):
     def get_description(self):
         pass
+
 
 
 class MilkyTea(Beverage):
@@ -45,7 +52,9 @@ class Coffee(Beverage):
         return 2.00
 
 
-class pearl(CondimentDecorator):
+
+class Pearl(object):
+
     def __init__(self, beverage):
         self.beverage = beverage
 
@@ -56,7 +65,9 @@ class pearl(CondimentDecorator):
         return 1.50 + self.beverage.cost()
 
 
-class Pudding(CondimentDecorator):
+
+class Pudding(object):
+
     def __init__(self, beverage):
         self.beverage = beverage
 
@@ -67,7 +78,8 @@ class Pudding(CondimentDecorator):
         return 1.60 + self.beverage.cost()
 
 
-class Milk(CondimentDecorator):
+class Milk(object):
+
     def __init__(self, beverage):
         self.beverage = beverage
 
@@ -79,20 +91,25 @@ class Milk(CondimentDecorator):
 
 
 if __name__ == '__main__':
+
     b = FruitJuice()
     print('%s = $%s' % (b.get_description(), b.cost()))
 
+    # b = FruitJuice()
+    # print('%s = $%s' %(b.get_description(), b.cost()) )
+
+
     b = MilkyTea()
-    b = pearl(b)
+    b = Pearl(b)
     b = Pudding(b)
     print('%s = $%s' % (b.get_description(), b.cost()))
 
     b = Coffee()
-    b = pearl(b)
+    b = Pearl(b)
     b = Pudding(b)
     print('%s = $%s' % (b.get_description(), b.cost()))
 
     b = Coffee()
-    b = pearl(b)
+    b = Pearl(b)
     b = Milk(b)
     print('%s = $%s' % (b.get_description(), b.cost()))
