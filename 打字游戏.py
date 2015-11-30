@@ -5,12 +5,10 @@ from tkinter import *
 from tkinter import ttk
 import time
 import random
+import threading
 
 
 
-# button = ttk.Button(frame, width=5, text='a')
-# button.grid(row=0,column=0)
-# button.grid_propagate(0)
 class Key:
 
     def __init__(self, canvas, window, down_speed = 0.01):
@@ -26,46 +24,48 @@ class Key:
         self.window = window
         self.window.register(self)
 
-        # window().register(self)
-
     def getchar(self):
         return self.keyvar
 
     def getposy(self):
+        end_time = time.time()
+        self.current_posy = int((end_time - self.start_time) * (1/self.down_speed))
         return self.current_posy
 
     def start_walk(self):
-        end_time = time.time()
-        self.current_posy = int((end_time - self.start_time) * (1/self.down_speed))
-        self.walk_down(self.current_posy)
+        while True:
+            if self.getposy() not in range(0,595) or self.flag == 'up' :
+                break
+            self.walk_down(self.getposy())
 
     def create_key(self, current_posy):
         self.id = self.canvas.create_text(self.posx,current_posy,text= self.keyvar)
         return self.id
 
     def walk_down(self, current_posy):
-        # for i in range(60):
         self.id = self.create_key(current_posy)
         self.canvas.update()
         time.sleep(self.down_speed)
-        # if self.getposy()
-        if key.getposy() != 595 and key.flag == 'down':
+        if self.getposy() != 595 and self.flag == 'down':
             self.delete_key(self.id)
         else:
             self.window.unregister(self)
 
-    def walk_up(self, current_posy):
-        if self.id != 0:
-            self.delete_key(self.id)
 
-        while current_posy >= 0:
-            print(current_posy)
-            id = self.create_key(current_posy)
-            current_posy -= 1
+
+    def walk_up_thread(self):
+        t = threading.Thread(target=self.walk_up)
+        t.start()
+
+    def walk_up(self):
+        self.delete_key(self.id)
+        # print(self.canvas)
+        while self.current_posy:
+            self.id = self.create_key(self.current_posy)
+            self.current_posy -= 1
             time.sleep(self.down_speed)
             self.canvas.update()
-            self.delete_key(id)
-
+            self.delete_key(self.id)
 
     def delete_key(self, id):
         self.canvas.delete(id)
@@ -74,9 +74,10 @@ class Key:
 
 class Window:
 
-    def __init__(self):
+    def __init__(self, canvas):
         self.key_list = []
 
+        canvas.bind_all('<Key>',self.getinputfromkeyborad)
 
     def register(self, key):
         self.key_list.append(key)
@@ -84,15 +85,20 @@ class Window:
         return self.key_list
 
     def getinputfromkeyborad(self,event):
+        key_one = []
         for key in self.key_list:
             if key.getchar() == event.char:
-                key.flag = 'up'
-                key_temp = key
-                # self.unregister(key)
-                key_temp.walk_up(key.getposy())
+                key_one.append(key)
+        print(key_one)
+        if key_one:
+            # self.unregister(key_one[0])
+
+            key_one[0].flag = 'up'
+            key_one[0].walk_up_thread()
 
     def unregister(self, key):
         self.key_list.remove(key)
+
 
 
 if __name__ == '__main__':
@@ -100,29 +106,19 @@ if __name__ == '__main__':
     style = ttk.Style()
     style.configure('mystyle.TFrame', background='white')
 
-
     frame = ttk.Frame(root, width=800, height=600, style='mystyle.TFrame')
     frame.grid_propagate(0)
     frame.grid(row=0,column=0)
 
-
     canvas = Canvas(frame,width=800, height=600, bg='white')
     canvas.grid()
 
-    L = range(595)
+    window = Window(canvas)
 
-    window = Window()
-    canvas.bind_all('<Key>',window.getinputfromkeyborad)
-
-    key = Key(canvas, window)
-
-    while True:
-        if key.getposy() not in L or key.flag == 'up' :
-            break
-        key.start_walk()
-
-
-
+    for i in range(5):
+        t = threading.Thread(target=Key(canvas,window).start_walk)
+        t.start()
     root.mainloop()
+
 
 
