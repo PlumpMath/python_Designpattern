@@ -51,8 +51,6 @@ class Key:
         else:
             self.window.unregister(self)
 
-
-
     def walk_up_thread(self):
         t = threading.Thread(target=self.walk_up)
         t.start()
@@ -76,7 +74,6 @@ class Window:
 
     def __init__(self, canvas):
         self.key_list = []
-
         canvas.bind_all('<Key>',self.getinputfromkeyborad)
 
     def register(self, key):
@@ -89,10 +86,7 @@ class Window:
         for key in self.key_list:
             if key.getchar() == event.char:
                 key_one.append(key)
-        print(key_one)
         if key_one:
-            # self.unregister(key_one[0])
-
             key_one[0].flag = 'up'
             key_one[0].walk_up_thread()
 
