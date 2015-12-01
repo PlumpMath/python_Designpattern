@@ -11,8 +11,8 @@ import threading
 
 class Key:
 
-    def __init__(self, canvas, window, down_speed = 0.01):
-        self.posx = random.choice(range(5,795))
+    def __init__(self, canvas, window, down_speed):
+        self.posx = random.choice(range(5,795,10))
         self.posy = 5
         self.keyvar = random.choice([chr(i) for i in range(ord("A"),ord("Z")+1)])
         self.canvas = canvas
@@ -22,7 +22,7 @@ class Key:
         self.id = 0
         self.flag = 'down'
         self.window = window
-        self.window.register(self)
+        self.window.register_key(self)
 
     def getchar(self):
         return self.keyvar
@@ -63,7 +63,7 @@ class Key:
         while self.current_posy:
             self.id = self.create_key(self.current_posy)
             self.current_posy -= 1
-            time.sleep(self.down_speed)
+            time.sleep(0.001)
             self.canvas.update()
             self.delete_key(self.id)
 
@@ -76,37 +76,101 @@ class Window:
 
     def __init__(self, canvas):
         self.key_list = []
-
+        self.printer_list = []
         canvas.bind_all('<Key>',self.getinputfromkeyborad)
 
-    def register(self, key):
+    def register_key(self, key):
         self.key_list.append(key)
         print(self.key_list)
         return self.key_list
+
+    def register_printer(self, printer):
+        self.printer_list.append(printer)
+        return self.printer_list
 
     def getinputfromkeyborad(self,event):
         key_one = []
         for key in self.key_list:
             if key.getchar() == event.char:
                 key_one.append(key)
-        print(key_one)
-        if key_one:
-            # self.unregister(key_one[0])
 
+        print(key_one)
+
+        if key_one:
             key_one[0].flag = 'up'
             key_one[0].walk_up_thread()
+            for printer in self.printer_list:
+                    printer.update_score()
+
+
 
     def unregister(self, key):
         self.key_list.remove(key)
+
+
+class Printer(object):
+
+    value = 0
+
+    def __init__(self, root,  window):
+        self.root = root
+        self.score = StringVar()
+        self.score.set(0)
+        window.register_printer(self)
+        self.create_printer()
+
+    def create_printer(self):
+        style = ttk.Style()
+        style.configure('mystyle.TFrame', background='white')
+        frame = ttk.Frame(self.root, width=200, height=600, relief='solid', style='mystyle.TFrame')
+        frame.grid_propagate(0)
+        frame.grid(row=0, column=1)
+        label = ttk.Label(frame, text='The Socre is:', background='white')
+        label.grid(row=0, column=0)
+        label = ttk.Label(frame, textvariable=self.score, background='white')
+        label.grid(row=0, column=1)
+
+
+    def update_score(self):
+        Printer.value += 1
+        self.score.set(Printer.value * 10)
+
+class TypingGame(object):
+    def __init__(self):
+        self.dict4speed = {
+            1: [4, 0.05, 3],
+            2: [5, 0.02, 2],
+            3: [6, 0.01, 1],
+            4: [7, 0.005, 0.5],
+            5: [10, 0.001, 0.02]
+        }
+
+        self.level = 1
+
+    def set_gamelevel(self, level):
+        self.level = level
+
+
+    def start(self):
+        while True:
+            time.sleep(self.dict4speed[self.level][2])
+            for i in range(self.dict4speed[self.level][0]):
+                t = threading.Thread(target=Key(canvas, window,self.dict4speed[self.level][1]).start_walk)
+                t.start()
+
+
+
+
+
 
 
 
 if __name__ == '__main__':
     root = Tk()
     style = ttk.Style()
-    style.configure('mystyle.TFrame', background='white')
+    style.configure('mystyle.TFrame', background='white',)
 
-    frame = ttk.Frame(root, width=800, height=600, style='mystyle.TFrame')
+    frame = ttk.Frame(root, width=800, height=600, relief='solid',  style='mystyle.TFrame')
     frame.grid_propagate(0)
     frame.grid(row=0,column=0)
 
@@ -114,11 +178,13 @@ if __name__ == '__main__':
     canvas.grid()
 
     window = Window(canvas)
+    printer = Printer(root, window)
 
-    for i in range(5):
-        t = threading.Thread(target=Key(canvas,window).start_walk)
-        t.start()
+    game = TypingGame()
+
+    t = threading.Thread(target=game.start)
+    t.start()
+
     root.mainloop()
-
 
 
