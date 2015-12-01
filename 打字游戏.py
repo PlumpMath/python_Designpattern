@@ -57,15 +57,17 @@ class Key:
         t = threading.Thread(target=self.walk_up)
         t.start()
 
+
     def walk_up(self):
         self.delete_key(self.id)
         # print(self.canvas)
         while self.current_posy:
-            self.id = self.create_key(self.current_posy)
             self.current_posy -= 1
-            time.sleep(0.001)
+            self.id = self.create_key(self.current_posy)
+            time.sleep(0.002)
             self.canvas.update()
             self.delete_key(self.id)
+
 
     def delete_key(self, id):
         self.canvas.delete(id)
@@ -135,14 +137,15 @@ class Printer(object):
         Printer.value += 1
         self.score.set(Printer.value * 10)
 
+
 class TypingGame(object):
     def __init__(self):
         self.dict4speed = {
-            1: [4, 0.05, 3],
-            2: [5, 0.02, 2],
-            3: [6, 0.01, 1],
-            4: [7, 0.005, 0.5],
-            5: [10, 0.001, 0.02]
+            1: [2, 0.08, 3],
+            2: [3, 0.06, 2],
+            3: [5, 0.03, 1],
+            4: [7, 0.01, 0.5],
+            5: [10, 0.005, 0.02]
         }
 
         self.level = 1
@@ -152,21 +155,19 @@ class TypingGame(object):
 
 
     def start(self):
-        while True:
-            time.sleep(self.dict4speed[self.level][2])
+        for i in range(101):
+            threading_list = []
             for i in range(self.dict4speed[self.level][0]):
                 t = threading.Thread(target=Key(canvas, window,self.dict4speed[self.level][1]).start_walk)
                 t.start()
-
-
-
-
-
-
+                threading_list.append(t)
+            for a_thread in threading_list:
+                a_thread.join(self.dict4speed[self.level][2])
 
 
 if __name__ == '__main__':
     root = Tk()
+    root.title('Typing gaming')
     style = ttk.Style()
     style.configure('mystyle.TFrame', background='white',)
 
@@ -184,6 +185,7 @@ if __name__ == '__main__':
 
     t = threading.Thread(target=game.start)
     t.start()
+
 
     root.mainloop()
 
