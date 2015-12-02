@@ -83,7 +83,7 @@ class Window:
 
     def register_key(self, key):
         self.key_list.append(key)
-        print(self.key_list)
+        # print(self.key_list)
         return self.key_list
 
     def register_printer(self, printer):
@@ -96,7 +96,7 @@ class Window:
             if key.getchar() == event.char:
                 key_one.append(key)
 
-        print(key_one)
+        # print(key_one)
 
         if key_one:
             key_one[0].flag = 'up'
@@ -114,10 +114,12 @@ class Printer(object):
 
     value = 0
 
-    def __init__(self, root,  window):
+
+    def __init__(self, root, window):
         self.root = root
         self.score = StringVar()
         self.score.set(0)
+        self.level = 1
         window.register_printer(self)
         self.create_printer()
 
@@ -136,10 +138,24 @@ class Printer(object):
     def update_score(self):
         Printer.value += 1
         self.score.set(Printer.value * 10)
+        print(self.score.get())
+        print(self.level)
+        if int(self.score.get()) == 50:
+            self.set_level()
+
+
+    def set_level(self):
+        Printer.value = 0
+        self.level+=1
+
+
+
+
+
 
 
 class TypingGame(object):
-    def __init__(self):
+    def __init__(self, printer):
         self.dict4speed = {
             1: [2, 0.08, 3],
             2: [3, 0.06, 2],
@@ -148,10 +164,9 @@ class TypingGame(object):
             5: [10, 0.005, 0.02]
         }
 
-        self.level = 1
+        self.level = printer.level
 
-    def set_gamelevel(self, level):
-        self.level = level
+
 
 
     def start(self):
@@ -181,7 +196,8 @@ if __name__ == '__main__':
     window = Window(canvas)
     printer = Printer(root, window)
 
-    game = TypingGame()
+    game = TypingGame(printer)
+
 
     t = threading.Thread(target=game.start)
     t.start()
