@@ -1,6 +1,10 @@
 __author__ = '沅源'
 # -*- coding:utf-8 -*-
 
+
+# 简单的打字游戏，感觉面向对象这一本部分还用的不是很好
+# 其中有用到观察者模式，这个游戏后续还会持续改进
+
 from tkinter import *
 from tkinter import ttk
 import time
@@ -190,7 +194,7 @@ class Printer(object):
         # print(Printer.value)
         self.score.set(Printer.value * 10)
 
-        if self.score.get() == str(1000):
+        if self.score.get() == str(800):
             print(self.score.get())
             self.set_level()
 
@@ -199,24 +203,10 @@ class Printer(object):
     def set_level(self):
         Printer.value = 0
         self.level+=1
-
-
-class TypingGame(object):
-    def __init__(self, printer):
-        self.dict4speed = {
-            1: [2, 0.08, 3],
-            2: [3, 0.06, 2],
-            3: [5, 0.03, 1],
-            4: [7, 0.01, 0.5],
-            5: [10, 0.005, 0.02]
-        }
-
-        self.level = printer.level
-
-    def set_level(self):
-        Printer.value = 0
-        self.level+=1
         self.stage.set(self.level)
+
+
+
 
 
 class TypingGame(object):
